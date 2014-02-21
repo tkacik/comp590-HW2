@@ -43,9 +43,19 @@ class candyGame(object):
         while True:
             x,y = player.move()
             if self.gameBoard[x][y] == "_":
-                self.gameBoard[x][y] = player.ID
+                self.gameBoard = self.updateState(x, y, player, self.gameBoard)
                 return True
             else: print "Invalid position"
+    
+    def updateState(self, x, y, player, gameBoard):
+        gameBoard[x][y] = player.ID
+        neighbors = {(i,j) for i,j in set([(x-1,y),(x+1,y),(x,y-1),(x,y+1)]) if self.inBounds(i,j)}
+        for i,j in neighbors:
+            if gameBoard[i][j] == player.ID:
+                for k,l in neighbors:
+                    if gameBoard[k][l] is not "_":
+                        gameBoard[k][l] = player.ID
+        return gameBoard
         
     def isGameOver(self):
         vacant = 0
@@ -54,6 +64,12 @@ class candyGame(object):
         if vacant==0: return True
         return False
                 
+    def inBounds(self, x, y):
+        if x >= (len(self.gameBoard)): return False
+        if y >= (len(self.gameBoard[x])): return False
+        if x < 0 or y < 0: return False
+        return True
+        
     def printLayout(self):
         layout = []
         for i in range(0, len(self.scoreBoard)):
