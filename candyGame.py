@@ -6,9 +6,12 @@ import util
 class candyGame(object):
     
     def __init__(self, scoreBoard="game_boards/AlmondJoy.txt"):
-        sourceBoard = open(scoreBoard)
         self.scoreBoard = []
         self.gameBoard = []
+        self.player1 = humanPlayer(self, "A")
+        self.player2 = humanPlayer(self, "B")
+        
+        sourceBoard = open(scoreBoard)        
         for line in sourceBoard:
             self.scoreBoard.append(line.strip().split("\t"))
         sourceBoard.close()
@@ -16,8 +19,14 @@ class candyGame(object):
             self.gameBoard.append([])
             for j in range(0, len(self.scoreBoard[i])):
                 self.gameBoard[i].append("_")
-        
-        self.backTracked = 0
+
+        turn1 = True
+        while not self.isGameOver():
+            if turn1: self.move(self.player1)
+            else: self.move(self.player2)
+            turn1 = not turn1 
+            self.printLayout()
+            
         
         '''if input == "stdin":
             self.N = eval(raw_input("How many friends?: "))
@@ -29,6 +38,21 @@ class candyGame(object):
             self.assignment = self.recursiveHide(self.assignment)
             print self.expanded, " nodes expanded."
             print self.backTracked, " times back-tracked."'''
+    
+    def move(self, player):
+        while True:
+            x,y = player.move()
+            if self.gameBoard[x][y] == "_":
+                self.gameBoard[x][y] = player.ID
+                return True
+            else: print "Invalid position"
+        
+    def isGameOver(self):
+        vacant = 0
+        for row in self.gameBoard:
+            vacant += row.count('_')
+        if vacant==0: return True
+        return False
                 
     def printLayout(self):
         layout = []
@@ -60,6 +84,18 @@ class candyGame(object):
 
     #recursiveHid takes a dictionary of variables to values    
     
+class candyPlayer(object):
+    def __init__(self, candyGame, ID="X"):
+        self.ID = ID
+        self.candyGame = candyGame
+         
+class humanPlayer(candyPlayer):
+    def move(self):
+        return eval(raw_input("Where next?: "))      
+         
+#class minimaxPlay(candyPlayer): #TODO
+         
+#class alphabetaPlayer(candyPlayer): #TODO         
          
 if  __name__ =='__main__':
     candyGame().printLayout()
