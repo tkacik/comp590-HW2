@@ -42,8 +42,8 @@ class candyGame(object):
     def move(self, player):
         while True:
             x,y = player.move()
-            if self.gameBoard[x][y] == "_":
-                self.gameBoard = self.updateState(x, y, player, self.gameBoard)
+            if self.gameBoard[x-1][y-1] == "_":
+                self.gameBoard = self.updateState(x-1, y-1, player, self.gameBoard)
                 return True
             else: print "Invalid position"
     
@@ -107,7 +107,7 @@ class candyPlayer(object):
          
 class humanPlayer(candyPlayer):
     def move(self):
-        return {(x-1, y-1) for x,y in eval(raw_input("Where next?: "))}      
+        return eval(raw_input("Player " + self.ID + ": "))      
          
 #class minimaxPlay(candyPlayer): #TODO
          
