@@ -107,7 +107,7 @@ class candyPlayer(object):
          
 class humanPlayer(candyPlayer):
     def move(self):
-        return eval(raw_input("Where next?: "))      
+        return {(x-1, y-1) for x,y in eval(raw_input("Where next?: "))}      
          
 #class minimaxPlay(candyPlayer): #TODO
          
