@@ -68,7 +68,7 @@ class hideNseek(object):
                 positions.push((i,j), self.runHeuristic((i,j), assignment))
         while not positions.isEmpty():
             i,j = positions.pop()
-            self.expanded += 1
+            self.expanded += 1                              #Expanding Node
             print "checking position", (i, j)
             if (i, j) in self.trees + assignment:           #Alldiff 
                 continue  
@@ -94,7 +94,7 @@ class hideNseek(object):
             print "position valid, continuing with ", newAssignment
             result = self.recursiveHide(newAssignment)
             if result != False: return result
-        self.backtracked += 1
+        self.backtracked += 1                               #Backtrack
         return False
          
 if  __name__ =='__main__':
