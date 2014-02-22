@@ -24,7 +24,21 @@ class hideNseek(object):
             self.assignment = self.recursiveHide(self.assignment)
             print self.expanded, " nodes expanded."
             print self.backTracked, " times back-tracked."
-                
+            
+        else:
+            source = open(input)
+            self.N, self.T = source.readline().strip().split("\t")
+            print self.N, "friends to hide."
+            self.N=eval(self.N)
+            print self.T, "trees to consider."
+            self.T=eval(self.T)
+            for i in range(0, self.T):
+                self.trees.append(source.readline().strip().split("\t"))
+                self.trees[i] = (eval(self.trees[i][0])-1, eval(self.trees[i][1])-1)
+            self.assignment = self.recursiveHide(self.assignment)
+            print self.expanded, " nodes expanded."
+            print self.backTracked, " times back-tracked."
+            
     def printLayout(self):
         layout = []
         for i in range(0, self.N):
@@ -46,7 +60,7 @@ class hideNseek(object):
             if len(assignment) == 0: return 0
             dx = abs(position[1] - assignment[len(assignment)-1][1])
             dy = abs(position[0] - assignment[len(assignment)-1][0])
-            print position, ": ", dx + dy
+            #print position, ": ", dx + dy
             return 0 - dx - dy
         if self.heuristic == "globalManhattan":
             if len(assignment) == 0: return 0
@@ -55,7 +69,7 @@ class hideNseek(object):
             for i,j in assignment:
                 dx += abs(position[1] - j)
                 dy += abs(position[0] - i)
-            print position, ": ", dx + dy
+            #print position, ": ", dx + dy
             return 0 - dx - dy
 
     #recursiveHid takes a dictionary of variables to values    
@@ -98,4 +112,4 @@ class hideNseek(object):
         return False
          
 if  __name__ =='__main__':
-    hideNseek("stdin", "globalManhattan").printLayout()
+    hideNseek("5in4.txt", "globalManhattan").printLayout()
