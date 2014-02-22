@@ -1,11 +1,11 @@
 # hideNseek.py
 # Created by T. J. Tkacik for Assignment 2 of COMP 590
 # Spring of 2014 at the University of North Carolina
-import util
+import util, sys
 
 class hideNseek(object):
     
-    def __init__(self, input="stdin", heuristic="nullHeuristic"):
+    def __init__(self, input="stdin", heuristic="nullHeuristic", loud=False):
         self.trees = []
         self.N = 0
         self.T = 0
@@ -13,32 +13,36 @@ class hideNseek(object):
         self.assignment = []
         self.heuristic = heuristic
         self.backTracked = 0
+        self.loud = loud
         
         if input == "stdin":
             self.N = eval(raw_input("How many friends?: "))
             self.T = eval(raw_input("How many trees?: "))
-            self.heuristic = raw_input("Heuristic to use?: ")
+            #self.heuristic = raw_input("Heuristic to use?: ")
             for i in range(0, self.T):
                 self.trees.append(eval(raw_input("Next tree? (X,Y): ")))
                 self.trees[i] = (self.trees[i][0]-1, self.trees[i][1]-1)
-            self.assignment = self.recursiveHide(self.assignment)
-            print self.expanded, " nodes expanded."
-            print self.backTracked, " times back-tracked."
-            
+                      
         else:
             source = open(input)
             self.N, self.T = source.readline().strip().split("\t")
-            print self.N, "friends to hide."
+            if self.loud: print self.N, "friends to hide."
             self.N=eval(self.N)
-            print self.T, "trees to consider."
+            if self.loud: print self.T, "trees to consider."
             self.T=eval(self.T)
             for i in range(0, self.T):
                 self.trees.append(source.readline().strip().split("\t"))
                 self.trees[i] = (eval(self.trees[i][0])-1, eval(self.trees[i][1])-1)
-            self.assignment = self.recursiveHide(self.assignment)
-            print self.expanded, " nodes expanded."
-            print self.backTracked, " times back-tracked."
-            
+           
+        self.assignment = self.recursiveHide(self.assignment)
+        if not self.assignment: 
+            print "No valid assignment."
+            sys.exit(0)
+        for friend in self.assignment:
+            print friend[0], friend[1]
+        print self.expanded, " nodes expanded."
+        print self.backTracked, " times back-tracked."
+ 
     def printLayout(self):
         layout = []
         for i in range(0, self.N):
@@ -83,7 +87,7 @@ class hideNseek(object):
         while not positions.isEmpty():
             i,j = positions.pop()
             self.expanded += 1                              #Expanding Node
-            print "checking position", (i, j)
+            if self.loud: print "checking position", (i, j)
             if (i, j) in self.trees + assignment:           #Alldiff 
                 continue  
             seeFriend = False
@@ -102,14 +106,35 @@ class hideNseek(object):
                             seeFriend = False
                             break
                 if seeFriend: break
+                if abs(x-i)==abs(y-j):
+                    seeFriend = True
+                    #print "Diagonals found at", x,y ,"and", i,j                    
+                    ratio = (x-i)/(y-j)
+                    for k in range(1, (i-x)):
+                        #print "checking for tree in", (x+k,y+(ratio*k))
+                        if(x+k,y+(ratio*k)) in self.trees:
+                            #print "Diagonal tree found at", x+k, y+(ratio*k)
+                            seeFriend = False
+                            break
+                if seeFriend: break
             if seeFriend:
                 continue
             newAssignment = assignment + [(i, j)]
-            print "position valid, continuing with ", newAssignment
+            if self.loud: print "position valid, continuing with ", newAssignment
             result = self.recursiveHide(newAssignment)
             if result != False: return result
-        self.backtracked += 1                               #Backtrack
+        self.backTracked += 1                               #Backtrack
         return False
          
 if  __name__ =='__main__':
-    hideNseek("15in8.txt", "globalManhattan").printLayout()
+    input = "stdin"
+    heuristic = ""
+    loud = False
+    if "-l" in sys.argv:
+        loud = True
+    if "-s" in sys.argv:
+        input = sys.argv[sys.argv.index("-s")+1]
+    if "-h" in sys.argv:
+        heuristic = sys.argv[sys.argv.index("-h")+1]
+
+    hideNseek(input, heuristic, loud)
