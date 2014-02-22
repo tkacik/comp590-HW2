@@ -112,4 +112,4 @@ class hideNseek(object):
         return False
          
 if  __name__ =='__main__':
-    hideNseek("5in4.txt", "globalManhattan").printLayout()
+    hideNseek("15in8.txt", "globalManhattan").printLayout()
