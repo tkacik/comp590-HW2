@@ -54,7 +54,7 @@ class candyGame(object):
     
     def updateState(self, x, y, player, gameBoard):
         gameBoard[x][y] = player.ID
-        neighbors = {(i,j) for i,j in set([(x-1,y),(x+1,y),(x,y-1),(x,y+1)])}
+        neighbors = set([(x-1,y),(x+1,y),(x,y-1),(x,y+1)])
         for i,j in neighbors:
             if self.inBounds(i,j):
                 if gameBoard[i][j] == player.ID:
