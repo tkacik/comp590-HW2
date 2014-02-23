@@ -1,15 +1,17 @@
 # candyGame.py
 # Created by T. J. Tkacik for Assignment 2 of COMP 590
 # Spring of 2014 at the University of North Carolina
-import util, sys
+import util, sys, time
 
 class candyGame(object):
     
-    def __init__(self, scoreBoard="game_boards/ReesesPieces.txt"):
+    def __init__(self, scoreBoard="game_boards/ReesesPieces.txt", player1="human", player2="human", loud=False):
         self.scoreBoard = []
         self.gameBoard = []
-        self.player1 = alphabetaPlayer(self, "A", 4)
-        self.player2 = minimaxPlayer(self, "B", 3)
+        self.player1 = self.parsePlayer(player1, "A")
+        self.player2 = self.parsePlayer(player2, "B")
+        self.loud = loud
+        self.moveCount = [0, 0]
         
         sourceBoard = open(scoreBoard)        
         for line in sourceBoard:
@@ -22,15 +24,20 @@ class candyGame(object):
 
         turn1 = True
         while not self.isGameOver(self.gameBoard):
-            if turn1: self.move(self.player1)
-            else: self.move(self.player2)
+            if turn1: 
+                self.move(self.player1)
+                self.moveCount[0] += 1
+            else: 
+                self.move(self.player2)
+                self.moveCount[1] += 1
             turn1 = not turn1 
-            self.printLayout()
+            if self.loud: self.printLayout()
         
         score = self.score(self.gameBoard)
         print "Game Over!"
-        print "Player", self.player1.ID, ":", score[0], "points,", self.player1.nodesExpanded, "nodes expanded"
-        print "Player", self.player2.ID, ":", score[1], "points,", self.player2.nodesExpanded, "nodes expanded"
+        self.printLayout()
+        print "Player", self.player1.ID, ":", score[0], "points,", self.player1.nodesExpanded, "nodes in", round(self.player1.timeTaken,1), " total seconds and", self.moveCount[0], "moves."
+        print "Player", self.player2.ID, ":", score[1], "points,", self.player2.nodesExpanded, "nodes in", round(self.player2.timeTaken,1), " total seconds and", self.moveCount[1], "moves."
         if score[0] > score[1]: print "Player", self.player1.ID, "wins!"
         elif score[0] < score[1]: print "Player", self.player2.ID, "wins!"
         else: print "Tied game!"
@@ -38,9 +45,11 @@ class candyGame(object):
     def move(self, player):
         while True:
             x,y = player.move()
-            if self.gameBoard[x][y] == "_":
-                self.gameBoard = self.updateState(x, y, player, self.gameBoard)
-                return True
+            if x < len(self.gameBoard) and y < len(self.gameBoard[0]):
+                if self.gameBoard[x][y] == "_":
+                    self.gameBoard = self.updateState(x, y, player, self.gameBoard)
+                    return True
+                else: print "Invalid position"
             else: print "Invalid position"
     
     def updateState(self, x, y, player, gameBoard):
@@ -100,9 +109,25 @@ class candyGame(object):
             newBoard.append(list(row))
         return newBoard
     
-    def otherPlayer(self, player):
+    def otherPlayer(self, player):                          #Returns the player other than that given
         if player == self.player1: return self.player2
         return self.player1
+    
+    def parsePlayer(self, playerString, ID):
+        if playerString == "human":
+            return humanPlayer(self, ID)
+        if "minimax" in playerString:
+            if len(playerString) > len("minimax"):
+                #print eval(playerString[len("minimax"):])
+                return minimaxPlayer(self, ID, eval(playerString[len("minimax"):]))
+            else: return minimaxPlayer(self, ID, 3)
+        if "alphabeta" in playerString:
+            if len(playerString) > len("alphabeta"):
+                return alphabetaPlayer(self, ID, eval(playerString[len("alphabeta"):]))
+            else: return alphabetaPlayer(self, ID, 4)
+        else:
+            print "Invalid player String:", playerString
+            sys.exit(0)
     
 class candyPlayer(object):
     def __init__(self, candyGame, ID="X", searchDepth=3):
@@ -110,6 +135,7 @@ class candyPlayer(object):
         self.candyGame = candyGame
         self.searchDepth = searchDepth
         self.nodesExpanded = 0
+        self.timeTaken = 0
         
     def evaluate(self, gameBoard):
         score = self.candyGame.myScore(gameBoard, self.ID)
@@ -118,16 +144,22 @@ class candyPlayer(object):
          
 class humanPlayer(candyPlayer):
     def move(self):
-        return eval(raw_input("Player " + self.ID + ": "))      
+        startTime = time.clock()
+        move = eval(raw_input("Human player " + self.ID + ": ")) 
+        timeTaken = time.clock()-startTime
+        self.timeTaken += timeTaken
+        #print "Expanded", (self.nodesExpanded - nodes), "nodes in", round(timeTaken, 3), "seconds."
+        return move
          
 class minimaxPlayer(candyPlayer):  
     def move(self):
         spot = self.minimax(self.candyGame.duplicateBoard())
-        print self.ID, "will take", spot
+        print "Minimax", self.ID, "will take", spot
         return spot
     
     def minimax(self, gameBoard):
         nodes = self.nodesExpanded
+        startTime = time.clock()
         x,y = None, None
         max = float("-inf")
         for i in range(0, len(gameBoard)):
@@ -141,7 +173,9 @@ class minimaxPlayer(candyPlayer):
                         #print "Taking", (i,j), "is the best move I see so far..."
                         max = value
                         x,y = i,j
-        print "Expanded", (self.nodesExpanded - nodes), "nodes."
+        timeTaken = time.clock()-startTime
+        self.timeTaken += timeTaken
+        if self.candyGame.loud: print "Minimax", self.ID, "expanded", (self.nodesExpanded - nodes), "nodes in", round(timeTaken, 3), "seconds."
         return (x, y)
     
     def minvalue(self,gameBoard, depth):
@@ -193,11 +227,12 @@ class minimaxPlayer(candyPlayer):
 class alphabetaPlayer(candyPlayer):
     def move(self):
         spot = self.minimax(self.candyGame.duplicateBoard())
-        print self.ID, "will take", spot
+        print "AlphaBeta", self.ID, "will take", spot
         return spot
     
     def minimax(self, gameBoard):
         nodes = self.nodesExpanded
+        startTime = time.clock()
         x,y = None, None
         max = float("-inf")
         for i in range(0, len(gameBoard)):
@@ -211,7 +246,9 @@ class alphabetaPlayer(candyPlayer):
                         #print "Taking", (i,j), "is the best move I see so far..."
                         max = value
                         x,y = i,j
-        print "Expanded", (self.nodesExpanded - nodes), "nodes."
+        timeTaken = time.clock()-startTime
+        self.timeTaken += timeTaken
+        if self.candyGame.loud: print "AlphaBeta", self.ID, "expanded", (self.nodesExpanded - nodes), "nodes in", round(timeTaken, 3), "seconds."
         return (x, y)
     
     def minvalue(self,gameBoard, depth, alpha, beta):
@@ -265,4 +302,39 @@ class alphabetaPlayer(candyPlayer):
         return max       
          
 if  __name__ =='__main__':
-    candyGame().printLayout()
+    board = "game_boards/ReesesPieces.txt"
+    heuristic = ""
+    loud = False
+    p1 = "human"
+    p2 = "human"
+    if "--help" in sys.argv:
+        print """
+        candyGame.py by T. J. Tkacik
+        
+        Accepted flags:
+
+        --help    for this help information
+        -l        for loud output, default False
+        -b        for game board source, default ReesesPieces.txt
+        -p1       for player one, default is human, see below
+        -p2       for player two, default is human, see below
+            players are given in form <playertype><depth>
+                Acceptable playertypes: human minimax alphabeta
+            Default depth is used if none is given
+                Default depths: human:0 minimax:3 alphabeta:4
+                
+        Examples:   candyGame.py -l -p2 minimax3 -b Ayds.txt
+                    candyGame.py -b long.txt
+        """
+        sys.exit(0)
+    if "-l" in sys.argv:
+        loud = True
+    if "-b" in sys.argv:
+        board = "game_boards/" + sys.argv[sys.argv.index("-b")+1]
+    if "-p1" in sys.argv:
+        p1 = sys.argv[sys.argv.index("-p1")+1]
+    if "-p2" in sys.argv:
+        p2 = sys.argv[sys.argv.index("-p2")+1]
+        
+   
+    game = candyGame(board, p1, p2, loud)
