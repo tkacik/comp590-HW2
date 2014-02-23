@@ -24,6 +24,7 @@ class candyGame(object):
 
         turn1 = True
         while not self.isGameOver(self.gameBoard):
+            if self.loud: self.printLayout()
             if turn1: 
                 self.move(self.player1)
                 self.moveCount[0] += 1
@@ -31,8 +32,7 @@ class candyGame(object):
                 self.move(self.player2)
                 self.moveCount[1] += 1
             turn1 = not turn1 
-            if self.loud: self.printLayout()
-        
+            
         score = self.score(self.gameBoard)
         print "Game Over!"
         self.printLayout()
