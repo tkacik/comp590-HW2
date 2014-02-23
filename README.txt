@@ -1,4 +1,4 @@
-Two python files contain the code to complete the Assignment 2 writeup. The help information can be accessed using the flag --help and is displayed below.
+Two python files contain the code used to complete the Assignment 2 writeup. The help information can be accessed using the flag --help and is displayed below.
 
 hideNseek.py by T. J. Tkacik
         
@@ -10,7 +10,7 @@ hideNseek.py by T. J. Tkacik
         -s        for input source, default stdin
         -h        for heuristic, default nullHeuristic
         
-        Examples:   hideNseek.py -s 10in4.txt -h globalManhattan
+        Examples:   hideNseek.py -s 10in5.txt -h globalManhattan
                     hideNseek.py -s 15in8.txt -h localManhattan
                     hideNseek.py -l
 
