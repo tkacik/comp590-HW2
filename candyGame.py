@@ -324,7 +324,7 @@ if  __name__ =='__main__':
                 Default depths: human:0 minimax:3 alphabeta:4
                 
         Examples:   candyGame.py -l -p2 minimax3 -b Ayds.txt
-                    candyGame.py -b long.txt
+                    candyGame.py -b long.txt -p1 minimax -p2 alphabeta3
         """
         sys.exit(0)
     if "-l" in sys.argv:
@@ -335,6 +335,5 @@ if  __name__ =='__main__':
         p1 = sys.argv[sys.argv.index("-p1")+1]
     if "-p2" in sys.argv:
         p2 = sys.argv[sys.argv.index("-p2")+1]
-        
-   
+    
     game = candyGame(board, p1, p2, loud)
