@@ -24,7 +24,7 @@ class hideNseek(object):
                 self.trees[i] = (self.trees[i][0]-1, self.trees[i][1]-1)
                       
         else:
-            source = open(input)
+            source = open("hide_places/"+input)
             self.N, self.T = source.readline().strip().split("\t")
             if self.loud: print self.N, "friends to hide."
             self.N=eval(self.N)
