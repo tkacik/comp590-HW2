@@ -144,7 +144,7 @@ if  __name__ =='__main__':
         -s        for input source, default stdin
         -h        for heuristic, default nullHeuristic
         
-        Examples:   hideNseek.py -s 10in4.txt -h globalManhattan
+        Examples:   hideNseek.py -s 10in5.txt -h globalManhattan
                     hideNseek.py -s 15in8.txt -h localManhattan
                     hideNseek.py -l
         """
