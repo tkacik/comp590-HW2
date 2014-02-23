@@ -130,11 +130,34 @@ if  __name__ =='__main__':
     input = "stdin"
     heuristic = ""
     loud = False
+    doPrint = False
+    
+    if "--help" in sys.argv:
+        print """
+        hideNseek.py by T. J. Tkacik
+        
+        Accepted flags:
+
+        --help    for this help information
+        -l        for loud output, default False
+        -p        to print the final game board
+        -s        for input source, default stdin
+        -h        for heuristic, default nullHeuristic
+        
+        Examples:   hideNseek.py -s 10in4.txt -h globalManhattan
+                    hideNseek.py -s 15in8.txt -h localManhattan
+                    hideNseek.py -l
+        """
+        sys.exit(0)
     if "-l" in sys.argv:
         loud = True
     if "-s" in sys.argv:
         input = sys.argv[sys.argv.index("-s")+1]
     if "-h" in sys.argv:
         heuristic = sys.argv[sys.argv.index("-h")+1]
-
-    hideNseek(input, heuristic, loud)
+    if "-p" in sys.argv:
+        doPrint = True
+    
+    game = hideNseek(input, heuristic, loud)
+    
+    if doPrint: game.printLayout()
