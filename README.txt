@@ -24,9 +24,10 @@ candyGame.py by T. J. Tkacik
         -p1       for player one, default is human, see below
         -p2       for player two, default is human, see below
             players are given in form <playertype><depth>
-                Acceptable playertypes: human minimax alphabeta
+                Acceptable playertypes: human minimax alphabeta quiescence
             Default depth is used if none is given
-                Default depths: human:0 minimax:3 alphabeta:4
+                Default depths: human:0 minimax:3 alphabeta:4 quiescence:2
                 
         Examples:   candyGame.py -l -p2 minimax3 -b Ayds.txt
                     candyGame.py -b long.txt -p1 minimax -p2 alphabeta3
+                    candyGame.py -b oases.txt -p1 human -p2 quiescence
