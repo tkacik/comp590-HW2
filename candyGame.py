@@ -406,9 +406,9 @@ class quiescencePlayer(candyPlayer):
                     for k,l in set([(i-1,j),(i+1,j),(i,j-1),(i,j+1)]):
                         if self.candyGame.inBounds(k,l):
                             if gameBoard[k][l] == self.candyGame.otherPlayer(self).ID:
-                                print "Noisy because", self.candyGame.otherPlayer(self).ID, "controls", (k,l)
+                                """print "Noisy because", self.candyGame.otherPlayer(self).ID, "controls", (k,l)
                                 self.candyGame.printLayout(gameBoard)
-                                sys.exit(0)
+                                sys.exit(0)"""
                                 return False
         return True
         
