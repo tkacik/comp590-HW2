@@ -130,7 +130,7 @@ class candyGame(object):
         if "quiescence" in playerString:
             if len(playerString) > len("quiescence"):
                 return quiescencePlayer(self, ID, eval(playerString[len("quiescence"):]))
-            else: return quiescencePlayer(self, ID, 2)
+            else: return quiescencePlayer(self, ID, 3)
         else:
             print "Invalid player String:", playerString
             sys.exit(0)
@@ -345,7 +345,7 @@ class quiescencePlayer(candyPlayer):
                 #print "then my chance of winning is", self.evaluate(gameBoard)
                 return self.evaluate(gameBoard)
             elif depth >= self.searchDepth:
-                quiet = self.isQuiet(self, prevNode, gameBoard)
+                quiet = self.isQuiet(prevNode, gameBoard)
                 if quiet: return self.evaluate(gameBoard)
                 else: self.quiesce += 1
             elif self.candyGame.isGameOver(gameBoard):
@@ -375,7 +375,7 @@ class quiescencePlayer(candyPlayer):
                 #print "then my chance of winning is", self.evaluate(gameBoard)
                 return self.evaluate(gameBoard)
             elif depth >= self.searchDepth:
-                quiet = self.isQuiet(self.candyGame.otherPlayer(self), prevNode, gameBoard)
+                quiet = self.isQuiet(prevNode, gameBoard)
                 if quiet: return self.evaluate(gameBoard)
                 else: self.quiesce += 1
             elif self.candyGame.isGameOver(gameBoard):
@@ -398,18 +398,20 @@ class quiescencePlayer(candyPlayer):
                     if value >= beta: return value
         return max       
     
-    def isQuiet(self, player, prevNode, gameBoard):
+    def isQuiet(self, prevNode, gameBoard):
         x, y = prevNode[0], prevNode[1]
         for i,j in set([(x-1,y),(x+1,y),(x,y-1),(x,y+1)]):
             if self.candyGame.inBounds(i,j):
                 if gameBoard[i][j] == "_":
                     for k,l in set([(i-1,j),(i+1,j),(i,j-1),(i,j+1)]):
                         if self.candyGame.inBounds(k,l):
-                            if gameBoard[k][l] == self.candyGame.otherPlayer(self).ID:
-                                """print "Noisy because", self.candyGame.otherPlayer(self).ID, "controls", (k,l)
-                                self.candyGame.printLayout(gameBoard)
-                                sys.exit(0)"""
-                                return False
+                            #print "Checking", (k, l), ":", gameBoard[k][l], 
+                            if gameBoard[k][l] != gameBoard[x][y]:
+                                if gameBoard[k][l] != "_":
+                                    """print prevNode, "noisy because", self.candyGame.otherPlayer(self).ID, "controls", (k,l)
+                                    self.candyGame.printLayout(gameBoard)
+                                    sys.exit(0)"""
+                                    return False
         return True
         
          
